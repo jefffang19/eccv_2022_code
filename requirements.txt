@@ -1,0 +1,10 @@
+albumentations==1.1.0
+numpy==1.19.1
+opencv_python==3.4.1.15
+pandas==0.24.2
+scikit_learn==1.0.2
+segmentation_models_pytorch==0.2.1
+torch==1.7.1
+torchvision==0.8.2
+tqdm==4.31.1
+warmup_scheduler==0.3.2
