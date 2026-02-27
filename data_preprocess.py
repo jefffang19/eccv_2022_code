@@ -1,5 +1,5 @@
 from cv2 import cv2
-import segmentation_models_pytorch as smp
+
 import albumentations as albu
 
 

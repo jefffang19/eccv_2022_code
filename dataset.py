@@ -4,7 +4,7 @@ import glob
 import numpy as np
 from cv2 import cv2
 import pandas as pd
-import segmentation_models_pytorch as smp
+
 
 import torch
 from torch.utils.data import DataLoader
@@ -16,7 +16,17 @@ from data_preprocess import get_preprocessing, pad_image
 RESIZE_PATCH_SIZE = 300
 ENCODER = 'resnet18'
 ENCODER_WEIGHTS = 'imagenet'
-preprocessing_fn = smp.encoders.get_preprocessing_fn(ENCODER, ENCODER_WEIGHTS)
+
+def resnet18_imagenet_preprocess(x, **kwargs):
+    mean = np.array([0.485, 0.456, 0.406])
+    std = np.array([0.229, 0.224, 0.225])
+    if x.max() > 1:
+        x = x / 255.0
+    x = x - mean
+    x = x / std
+    return x.astype('float32')
+
+preprocessing_fn = resnet18_imagenet_preprocess
 
 class Dataset_NIH(BaseDataset):
     """
