@@ -34,6 +34,15 @@ ram: 24GB
 
 
 5. How to run on Jetson Nano
+On your host PC, export model to onnx
+```
+python export_onnx.py
+```
+
+On your jetson nano, change onnx model to engine
+```
+/usr/src/tensorrt/bin/trtexec --onnx=model.onnx --saveEngine=model.engine --fp16
+```
 
 Disable GUI to save MEM (optional)
 ```
@@ -56,6 +65,6 @@ pip3 install tqdm
 
 Run test by
 ```
-python3 test.py
+python3 test_trt.py
 ```
 
