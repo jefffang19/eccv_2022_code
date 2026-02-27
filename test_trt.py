@@ -91,10 +91,11 @@ def main():
     
     # Identify index of "whole_predict" output in the model bindings
     output_names = [engine.get_binding_name(i) for i in range(engine.num_bindings) if not engine.binding_is_input(i)]
+    print(f"Engine output names: {output_names}")
     if 'whole_predict' in output_names:
         whole_predict_idx = output_names.index('whole_predict')
     else:
-        whole_predict_idx = -1 # Fallback to last output
+        whole_predict_idx = -1  # Fallback to last output
         
     for i, (x, y, _, _) in enumerate(test_loader):
         batch_size = x.shape[0]

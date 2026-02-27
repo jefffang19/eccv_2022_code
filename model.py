@@ -35,8 +35,8 @@ class Net(nn.Module):
         batch_size = x.shape[0]
         x = x.view(x.shape[0]*x.shape[1], *x.shape[2:])
         
-        # input size
-        input_size = (x.shape[2], x.shape[3])
+        # The incoming patches are always resized to 300x300
+        input_size = (300, 300)
         
         # backbone
         features = self.feature_extract(x)
@@ -54,20 +54,9 @@ class Net(nn.Module):
         
         # patch predictions
         # now we weighted sum patches features to form image level features
-        weighted_sum_features = []
-        patch_logits_collect = []
-        for b in range(batch_size):
-            # get each patch weight using patchwise class prob on nodule
-            # perform weighted sum on feature map of each patch
-            patch_logits = self.patchwise_fc(patch_x[b])
-            patch_logits_collect.append(patch_logits)
-            weighted_sum_features.append((patch_x[b] * F.softmax(patch_logits[:, 1], dim=0).view(16, 1)).sum(dim=0))
-        
-        # patches logists collect
-        patch_logits_collect = torch.stack(patch_logits_collect)
-        
-        # patches features aggregations
-        patch_features = torch.stack(weighted_sum_features)
+        patch_logits_collect = self.patchwise_fc(patch_x)
+        weights = F.softmax(patch_logits_collect[:, :, 1], dim=1).unsqueeze(-1)
+        patch_features = (patch_x * weights).sum(dim=1)
         patch_logists = self.patch_aggr_fc(patch_features)
 
         # combine whole image and patch predictions
@@ -75,8 +64,7 @@ class Net(nn.Module):
         
         # CAM
         cam_map = torch.sum(features * self.patchwise_fc.weight[0].view(512, 1, 1), dim=1)
-        resize = transforms.Resize(input_size)
-        cam_map = resize(cam_map)
+        cam_map = F.interpolate(cam_map.unsqueeze(1), size=input_size, mode='bilinear', align_corners=False).squeeze(1)
         # reshape back to (b, 17, ...)
         cam_map = cam_map.view(batch_size, 17, *cam_map.shape[1:])
         
