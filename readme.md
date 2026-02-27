@@ -49,12 +49,6 @@ sudo docker run -it --rm --runtime nvidia --network host \
     nvcr.io/nvidia/l4t-ml:r32.7.1-py3
 ```
 
-In container, install cv2
-```
-apt-get update
-apt-get install python3-opencv
-```
-
 Install other dependency
 ```
 pip3 install tqdm
