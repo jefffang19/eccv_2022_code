@@ -103,9 +103,8 @@ def main():
     for i, (x, y, _, _) in enumerate(test_loader):
         batch_size = x.shape[0]  # should always be 1
         
-        # Fill inputs: First input is image (x), Second is dummy class (unused)
+        # Fill input: image tensor (cls was pruned by ONNX exporter — not used)
         np.copyto(inputs[0].host, x.numpy().ravel())
-        np.copyto(inputs[1].host, np.zeros((batch_size,), dtype=np.int64).ravel())
         
         # Run TRT inference
         trt_outputs = do_inference(context, bindings, inputs, outputs, stream)
