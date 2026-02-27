@@ -169,9 +169,9 @@ def get_dataset_nih(nih_nodule_path, nih_normal_path, batch = 4):
     testset = Dataset_NIH(df_paths, "test", augmentation=get_validation_augmentation(), preprocessing=get_preprocessing(preprocessing_fn), do_resize=(RESIZE_PATCH_SIZE, RESIZE_PATCH_SIZE), clahe=False)
     
     # dataloader
-    train_loader = torch.utils.data.DataLoader(trainset, batch_size=batch, shuffle=True, num_workers=4)
-    valid_loader = torch.utils.data.DataLoader(validset, batch_size=batch, shuffle=False, num_workers=4)
-    test_loader = torch.utils.data.DataLoader(testset, batch_size=batch, shuffle=False, num_workers=4)
+    train_loader = torch.utils.data.DataLoader(trainset, batch_size=batch, shuffle=True, num_workers=0)
+    valid_loader = torch.utils.data.DataLoader(validset, batch_size=batch, shuffle=False, num_workers=0)
+    test_loader = torch.utils.data.DataLoader(testset, batch_size=batch, shuffle=False, num_workers=0)
 
     return train_loader, valid_loader, test_loader
 
@@ -184,6 +184,6 @@ def renew_train_nih(nih_nodule_path, nih_normal_path, batch = 4):
     trainset = Dataset_NIH(df_paths, "train", augmentation=get_training_augmentation(), preprocessing=get_preprocessing(preprocessing_fn), do_resize=(RESIZE_PATCH_SIZE, RESIZE_PATCH_SIZE), clahe=False)
     
     # dataloader
-    train_loader = torch.utils.data.DataLoader(trainset, batch_size=batch, shuffle=True, num_workers=4)
+    train_loader = torch.utils.data.DataLoader(trainset, batch_size=batch, shuffle=True, num_workers=0)
 
     return train_loader
