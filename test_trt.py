@@ -80,9 +80,12 @@ def main():
     print("Engine loaded successfully.")
 
     print("Loading dataset...")
-    _, _, test_loader = get_dataset_nih(nih_nodule_dataset, nih_normal_dataset, batch=4)
+    _, _, test_loader = get_dataset_nih(nih_nodule_dataset, nih_normal_dataset, batch=1)
     
     context = engine.create_execution_context()
+    
+    # Allocate buffers once — input/output shapes are fixed (static graph, batch=1)
+    inputs, outputs, bindings, stream = allocate_buffers(engine, context)
 
     ys = []
     prds = []
@@ -98,38 +101,24 @@ def main():
         whole_predict_idx = -1  # Fallback to last output
         
     for i, (x, y, _, _) in enumerate(test_loader):
-        batch_size = x.shape[0]
+        batch_size = x.shape[0]  # should always be 1
         
-        # Set dynamic shape for inputs
-        context.set_binding_shape(0, (batch_size, 17, 3, 300, 300))
-        context.set_binding_shape(1, (batch_size,))
-        
-        # Allocate buffers based on the set dynamic shape
-        inputs, outputs, bindings, stream = allocate_buffers(engine, context)
-        
-        # Fill inputs: First input is image (x), Second is dummy class
+        # Fill inputs: First input is image (x), Second is dummy class (unused)
         np.copyto(inputs[0].host, x.numpy().ravel())
-        cls_dummy = np.zeros((batch_size,), dtype=np.int64) 
-        np.copyto(inputs[1].host, cls_dummy.ravel())
+        np.copyto(inputs[1].host, np.zeros((batch_size,), dtype=np.int64).ravel())
         
         # Run TRT inference
         trt_outputs = do_inference(context, bindings, inputs, outputs, stream)
         
-        # Extract whole image predictions
+        # Extract whole image predictions: shape (1, 2)
         whole_predict = trt_outputs[whole_predict_idx].reshape(batch_size, 2)
         
         # Apply softmax
         whole_predict = np.exp(whole_predict) / np.sum(np.exp(whole_predict), axis=1, keepdims=True)
         
-        # Save results for evaluation
+        # Accumulate results for evaluation
         ys.extend(y.numpy().astype(np.int32))
         prds.extend(whole_predict[:, 1].astype(np.float32))
-        
-        # Free device memory 
-        for inp in inputs:
-            inp.device.free()
-        for out in outputs:
-            out.device.free()
 
     ys = np.array(ys)
     prds = np.array(prds)
