@@ -1,5 +1,4 @@
 from torch.optim.lr_scheduler import CosineAnnealingLR
-from warmup_scheduler import GradualWarmupScheduler
 from model import Net
 from dataset import get_dataset_nih, renew_train_nih
 from valid_an_epoch import test_step
