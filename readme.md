@@ -31,3 +31,37 @@ Our specs
 cpu: Intel(R) Core(TM) i5-10500 CPU @ 3.10GHz
 gpu: NVIDIA GeForce GTX 1080 Ti
 ram: 24GB
+
+
+5. How to run on Jetson Nano
+
+Disable GUI to save MEM (optional)
+```
+sudo init 3
+```
+
+Use Nvidia docker image
+
+```
+sudo docker run -it --rm --runtime nvidia --network host \
+    -v /path/to/code:/work \
+    -w /work \
+    nvcr.io/nvidia/l4t-ml:r32.7.1-py3
+```
+
+In container, install cv2
+```
+apt-get update
+apt-get install python3-opencv
+```
+
+Install other dependency
+```
+pip3 install tqdm
+```
+
+Run test by
+```
+python3 test.py
+```
+
