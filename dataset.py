@@ -18,6 +18,11 @@ ENCODER = 'resnet18'
 ENCODER_WEIGHTS = 'imagenet'
 
 def resnet18_imagenet_preprocess(x, **kwargs):
+    if x.ndim == 3 and x.shape[-1] == 1:
+        x = np.repeat(x, 3, axis=-1)
+    elif x.ndim == 2:
+        x = np.repeat(np.expand_dims(x, axis=-1), 3, axis=-1)
+        
     mean = np.array([0.485, 0.456, 0.406])
     std = np.array([0.229, 0.224, 0.225])
     if x.max() > 1:

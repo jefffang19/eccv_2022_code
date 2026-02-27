@@ -1,5 +1,5 @@
 import torch
-import sklearn
+import sklearn.metrics
 import numpy as np
 from tqdm import tqdm
 
